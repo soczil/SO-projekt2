@@ -12,6 +12,8 @@ global pix
 %endmacro
 
 %macro PUSH_REGS 0
+  push rdi
+  push rsi
   push rbx
   push rbp
   push rsp
@@ -29,6 +31,8 @@ global pix
   pop rsp
   pop rbp
   pop rbx
+  pop rsi
+  pop rdi
 %endmacro
 
 ; wynik w rax
@@ -92,20 +96,42 @@ global pix
 %macro s_j 2
   xor r9d, r9d ; <--------- wynik
   xor esi, esi ; k
+  mov r10, 8
 %%first_loop:
   cmp rsi, %1
   ja %%first_loop_exit
   mov rax, rsi
-  mul 8
+  mul r10
   mov rdi, rax ; rdi = mianownik
   add rdi, %2
   mov rbp, %1
   sub rbp, rsi ; n-k
   pow_mod 16, rbp, rdi
   div_frac r8, rdi
-  add r9, rdx ; rax??????
+  add r9, rax ; rax??????
   inc rsi ; zwieksz k
+  jmp %%first_loop
 %%first_loop_exit:
+  mov rbp, 0x1000000000000000
+  mov rcx, rbp ; rcx = licznik
+%%second_loop:
+  mov rax, rsi
+  mul r10
+  mov rdi, rax
+  add rdi, %2
+  xor rdx, rdx
+  mov rax, rcx
+  div rdi
+  test rax, rax
+  jz %%exit
+  add r9, rax ; rdx????
+  xor rdx, rdx
+  mov rax, rcx
+  mul rbp
+  mov rcx, rdx
+  inc rsi
+  jmp %%second_loop
+%%exit:
 %endmacro
 
 section .rodata
@@ -117,10 +143,10 @@ section .bss
 section .text
 align 8
 pix:
-  PUSH_REGS
   lea rcx, [rdi]
   mov r8, [rsi]
   xor r9, r9
+  PUSH_REGS
 pix_loop:
   cmp r9, rdx
   jae exit
@@ -128,13 +154,18 @@ pix_loop:
   inc r9
   jmp pix_loop
 exit:
-  mov r12, 56
-  mov r13, 0
+  mov r12, 1252342324212312313
+  mov r13, 340
   mov r14, 9
   ;div_frac r12, r13
   ;largest_pow r13
-  pow_mod r12, r13, r14
+  ;pow_mod r12, r13, r14
   ;mov rax, rdx
-  mov rax, r8
+  ;mov rax, r8
+  ;mov rax, r14
+  ;mov r10, 8
+  ;mul r10
+  s_j 24, 5
+  mov rax, r9
   POP_REGS
   ret
