@@ -1,8 +1,7 @@
 global pix
+extern pixtime
 
 %macro PUSH_REGS 0
-  push rdi
-  push rsi
   push rbx
   push rbp
   push rsp
@@ -20,8 +19,6 @@ global pix
   pop rsp
   pop rbp
   pop rbx
-  pop rsi
-  pop rdi
 %endmacro
 
 ; wynik w rax
@@ -75,45 +72,6 @@ global pix
 %%exit:
 %endmacro
 
-; ; %1 - n, %2 - j
-; %macro s_j 2
-;   xor r9d, r9d ; <--------- wynik
-;   xor r14d, r14d ; k
-; %%first_loop:
-;   cmp r14, %1
-;   ja %%first_loop_exit
-;   mov rdi, r14 ; rdi = mianownik
-;   shl rdi, 3
-;   add rdi, %2
-;   mov rbp, %1
-;   sub rbp, r14 ; n-k
-;   pow_mod rbp, rdi
-;   div_frac r8, rdi
-;   add r9, rax ; rax??????
-;   inc r14 ; zwieksz k
-;   jmp %%first_loop
-; %%first_loop_exit:
-;   mov rbp, 0x1000000000000000
-;   mov rcx, rbp ; rcx = licznik
-; %%second_loop:
-;   mov rdi, r14
-;   shl rdi, 3
-;   add rdi, %2
-;   xor rdx, rdx
-;   mov rax, rcx
-;   div rdi
-;   test rax, rax
-;   jz %%exit
-;   add r9, rax ; rdx????
-;   xor rdx, rdx
-;   mov rax, rcx
-;   mul rbp
-;   mov rcx, rdx
-;   inc r14
-;   jmp %%second_loop
-; %%exit:
-; %endmacro
-
 %macro pi 0
   xor r10d, r10d
   push r13
@@ -131,6 +89,20 @@ global pix
   call s_j
   sub r10, r9
   pop r13
+%endmacro
+
+%macro time 0
+  push rdi
+  push rsi
+  push rdx
+  rdtsc
+  shl rdx, 32
+  add rdx, rax
+  mov rdi, rdx
+  call pixtime
+  pop rdx
+  pop rsi
+  pop rdi
 %endmacro
 
 section .text
@@ -173,6 +145,7 @@ s_j:
 .exit:
   ret
 pix:
+  time
   PUSH_REGS
   lea r11, [rdi]
   mov r13, rdx
@@ -194,4 +167,5 @@ exit:
   pop rdi
   POP_REGS
   xor eax, eax
+  time
   ret
