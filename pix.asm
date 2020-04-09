@@ -61,6 +61,8 @@ global pix
 ; Nie zachowuje %2, wynik w r8.
 ; modyfikuje rax, rdx, r8, rcx
 %macro pow_mod 3
+  test %2, %2
+  jz %%check_mod
   mov rax, %1
   xor edx, edx
   div %3
@@ -68,8 +70,8 @@ global pix
   mov r8, rdx
   jz %%exit
   mov r8, 1
-  test %2, %2
-  jz %%exit
+  ;test %2, %2
+  ;jz %%exit
   mov rcx, rdx
 %%main_loop:
   test %2, 1 ; y nieparzysty
@@ -89,6 +91,12 @@ global pix
   mov rcx, rdx
   shr %2, 1
   jnz %%main_loop
+  jmp %%exit
+%%check_mod:
+  mov r8, 1
+  xor ecx, ecx
+  cmp %3, 1
+  cmove r8, rcx
 %%exit:
 %endmacro
 
@@ -96,13 +104,11 @@ global pix
 %macro s_j 2
   xor r9d, r9d ; <--------- wynik
   xor esi, esi ; k
-  mov r10, 8
 %%first_loop:
   cmp rsi, %1
   ja %%first_loop_exit
-  mov rax, rsi
-  mul r10
-  mov rdi, rax ; rdi = mianownik
+  mov rdi, rsi ; rdi = mianownik
+  shl rdi, 3
   add rdi, %2
   mov rbp, %1
   sub rbp, rsi ; n-k
@@ -115,9 +121,8 @@ global pix
   mov rbp, 0x1000000000000000
   mov rcx, rbp ; rcx = licznik
 %%second_loop:
-  mov rax, rsi
-  mul r10
-  mov rdi, rax
+  mov rdi, rsi
+  shl rdi, 3
   add rdi, %2
   xor rdx, rdx
   mov rax, rcx
@@ -132,6 +137,19 @@ global pix
   inc rsi
   jmp %%second_loop
 %%exit:
+%endmacro
+
+%macro pi 1
+  xor r10d, r10d
+  s_j %1, 1
+  lea r10, [r9 + r9 * 1]
+  s_j %1, 4
+  sub r10, r9
+  add r10, r10
+  s_j %1, 5
+  sub r10, r9
+  s_j %1, 6
+  sub r10, r9
 %endmacro
 
 section .rodata
@@ -154,9 +172,9 @@ pix_loop:
   inc r9
   jmp pix_loop
 exit:
-  mov r12, 1252342324212312313
-  mov r13, 340
-  mov r14, 9
+  mov r12, 234
+  mov r13, 4
+  mov r14, 543
   ;div_frac r12, r13
   ;largest_pow r13
   ;pow_mod r12, r13, r14
@@ -165,7 +183,12 @@ exit:
   ;mov rax, r14
   ;mov r10, 8
   ;mul r10
-  s_j 24, 5
-  mov rax, r9
+  ;s_j 24, 6
+  ;mov rax, r9
+  xor r9, r9
+  pi 24
+  mov rax, r10
+  ;pow_mod r12, r13, r14
+  ;mov rax, r8
   POP_REGS
   ret
