@@ -161,20 +161,31 @@ section .bss
 section .text
 align 8
 pix:
-  lea rcx, [rdi]
-  mov r8, [rsi]
-  xor r9, r9
+  ;lea rcx, [rdi]
+  ;mov r8, [rsi]
+  ;xor r9, r9
   PUSH_REGS
+  lea r11, [rdi]
+  mov r12, [rsi]
+  mov r13, rdx
+  push rdi
+  push rsi
+  push rdx
 pix_loop:
-  cmp r9, rdx
+  ;cmp r9, rdx
+  ;jae exit
+  ;mov dword [rcx + 4 * r9], 50
+  ;inc r9
+  ;jmp pix_loop
+  cmp r12, r13
   jae exit
-  mov dword [rcx + 4 * r9], 50
-  inc r9
+  mov dword [r11 + 4 * r12], 50
+  inc r12
   jmp pix_loop
 exit:
-  mov r12, 234
-  mov r13, 4
-  mov r14, 543
+  ;mov r12, 234
+  ;mov r13, 4
+  ;mov r14, 543
   ;div_frac r12, r13
   ;largest_pow r13
   ;pow_mod r12, r13, r14
@@ -186,9 +197,13 @@ exit:
   ;s_j 24, 6
   ;mov rax, r9
   xor r9, r9
-  pi 24
+  pi 0
+  shr r10, 32
   mov rax, r10
   ;pow_mod r12, r13, r14
   ;mov rax, r8
+  pop rdx
+  pop rsi
+  pop rdi
   POP_REGS
   ret
