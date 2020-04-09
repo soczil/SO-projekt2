@@ -44,20 +44,6 @@ global pix
   div rbx
 %endmacro
 
-%macro largest_pow 1
-  test %1, %1
-  xor eax, eax
-  je %%exit
-  mov eax, 1
-  cmp rax, %1
-%%shift_left:
-  shl rax, 1
-  cmp rax, %1
-  jbe %%shift_left
-  shr rax, 1
-%%exit:
-%endmacro
-
 ; Nie zachowuje %2, wynik w r8.
 ; modyfikuje rax, rdx, r8, rcx
 %macro pow_mod 3
@@ -103,25 +89,25 @@ global pix
 ; %1 - n, %2 - j
 %macro s_j 2
   xor r9d, r9d ; <--------- wynik
-  xor esi, esi ; k
+  xor r14d, r14d ; k
 %%first_loop:
-  cmp rsi, %1
+  cmp r14, %1
   ja %%first_loop_exit
-  mov rdi, rsi ; rdi = mianownik
+  mov rdi, r14 ; rdi = mianownik
   shl rdi, 3
   add rdi, %2
   mov rbp, %1
-  sub rbp, rsi ; n-k
+  sub rbp, r14 ; n-k
   pow_mod 16, rbp, rdi
   div_frac r8, rdi
   add r9, rax ; rax??????
-  inc rsi ; zwieksz k
+  inc r14 ; zwieksz k
   jmp %%first_loop
 %%first_loop_exit:
   mov rbp, 0x1000000000000000
   mov rcx, rbp ; rcx = licznik
 %%second_loop:
-  mov rdi, rsi
+  mov rdi, r14
   shl rdi, 3
   add rdi, %2
   xor rdx, rdx
@@ -134,7 +120,7 @@ global pix
   mov rax, rcx
   mul rbp
   mov rcx, rdx
-  inc rsi
+  inc r14
   jmp %%second_loop
 %%exit:
 %endmacro
@@ -169,7 +155,6 @@ pix:
   mov r12, [rsi]
   mov r13, rdx
   push rdi
-  push rsi
   push rdx
 pix_loop:
   ;cmp r9, rdx
@@ -177,10 +162,15 @@ pix_loop:
   ;mov dword [rcx + 4 * r9], 50
   ;inc r9
   ;jmp pix_loop
+  mov r12, [rsi]
+  inc qword [rsi]
   cmp r12, r13
   jae exit
-  mov dword [r11 + 4 * r12], 50
-  inc r12
+  mov r15, r12
+  shl r15, 3
+  pi r15
+  shr r10, 32
+  mov dword [r11 + 4 * r12], r10d
   jmp pix_loop
 exit:
   ;mov r12, 234
@@ -196,14 +186,14 @@ exit:
   ;mul r10
   ;s_j 24, 6
   ;mov rax, r9
-  xor r9, r9
-  pi 0
-  shr r10, 32
-  mov rax, r10
+  ;xor r9, r9
+  ;pi 0
+  ;shr r10, 32
+  ;mov rax, r10
   ;pow_mod r12, r13, r14
   ;mov rax, r8
   pop rdx
-  pop rsi
   pop rdi
   POP_REGS
+  xor eax, eax
   ret
