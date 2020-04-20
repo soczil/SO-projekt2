@@ -1,6 +1,6 @@
 # SO-projekt2
+## PIX
 
-PIX
 Zaimplementować w asemblerze funkcję, która oblicza wybrany fragment części ułamkowej dwójkowego rozwinięcia liczby π i którą można wywołać z języka C. Należy użyć w tym celu formuły Baileya–Borweina–Plouffe'a. Dla problemu obliczenia początkowych cyfr rozwinięcia π znane są formuły szybciej zbieżne, ale ta ma dwie zalety. Po pierwsze można za jej pomocą obliczać cyfry od pewnego miejsca bez znajomości poprzednich cyfr, co sprawia, że łatwo jest zrównoleglić obliczenia. Po drugie do jej implementacji wystarczy arytmetyka stałopozycyjna, co sprawia, że implementacja może być bardzo szybka.
 
 Implementowana funkcja ma się nazywać pix i ma mieć następującą deklarację w języku C:
