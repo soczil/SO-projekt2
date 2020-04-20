@@ -16,6 +16,7 @@ Parametr ppi jest wskaźnikiem na tablicę, gdzie funkcja umieszcza obliczone wa
 - 299F31D0
 - 082EFA98
 - EC4E6C89
+
 Parametr pidx jest wskaźnikiem na indeks elementu w tablicy ppi. Funkcja pix działa w pętli. W każdej iteracji wykonuje atomową operację pobrania wartości tego indeksu i zwiększenia jego wartości o jeden. Przyjmijmy, że pobrana (przed zwiększeniem) wartość wynosi m. Jeśli m jest mniejsze niż wartość parametru max, funkcja oblicza bity rozwinięcia o numerach od 32m+1 do 32m+32 i umieszcza wynik w ppi[m]. Jeśli m jest większe lub równe max funkcja kończy działanie.
 
 Jednocześnie może być uruchomionych wiele instancji funkcji pix, każda w osobnym wątku. Instancje te mają dostęp do wspólnej globalnej zmiennej wskazywanej przez parametr pidx oraz globalnej tablicy ppi i dzielą między siebie pracę, używając tych globalnych zmiennych w wyżej opisany sposób.
